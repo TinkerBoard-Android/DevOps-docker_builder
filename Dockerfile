@@ -60,6 +60,11 @@ RUN apt-get install -y rpm2cpio ninja-build sshpass
 # Install additional packages for Rockchip RK3399PRO Android Oreo builds
 RUN apt-get install -y liblz4-tool
 
+# Install Oracle Java JDK6 for Android Kitkat builds
+COPY jdk-6u45-linux-x64.bin /home/builder/jdk-6u45-linux-x64.bin
+RUN chmod a+x /home/builder/jdk-6u45-linux-x64.bin
+RUN /home/builder/jdk-6u45-linux-x64.bin
+
 # Work in the source directory
 WORKDIR /source
 
