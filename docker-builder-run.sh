@@ -16,7 +16,22 @@ if [ ! -d $PATH_TO_SOURCE ]; then
   exit
 fi
 
-OPTION="--rm -it"
+DOCKER_IMAGE=${2:-}
+if [[ $DOCKER_IMAGE == "ubuntu16.04" ]]; then
+	DOCKER_IMAGE=_$DOCKER_IMAGE
+	if [[ "$(docker images -q asus/builder$DOCKER_IMAGE 2> /dev/null)" == "" ]]; then
+  		echo "Please run 'make ubuntu16' to make asus/builder$DOCKER_IMAGE docker image"
+		exit
+	else
+		echo "Use asus/builder$DOCKER_IMAGE image to docker run command"
+	fi
+else
+	DOCKER_IMAGE=""
+	echo "Use default docker image asus/builder"
+fi
+
+OPTION="--privileged"
+OPTION+=" --rm -it"
 
 # Add option to use the current user ID and group ID on the host
 USER_ID=$(id -u)
@@ -40,5 +55,5 @@ CMD="/bin/bash"
 echo "Option to run docker: $OPTION"
 #echo "Shell command to be exectued in the container: $CMD"
 
-docker run $OPTION asus/builder:latest /bin/sh -c "$CMD"
+docker run $OPTION asus/builder$DOCKER_IMAGE:latest /bin/sh -c "$CMD"
 #docker run $OPTION asus/builder:latest
