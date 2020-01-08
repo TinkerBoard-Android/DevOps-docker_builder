@@ -1,59 +1,63 @@
 #!/bin/bash
-#
-# Author: Leslie Yu <leslie_yu@asus.com>
-#
 
-set -e
+set -xe
 
-if [ $# -eq 0 ]; then
-    echo "Please provide the path to the source as the argument."
+if [ -x "$(command -v docker)" ]; then
+    echo "Docker is installed and the execute permission is granted."
+    if getent group docker | grep &>/dev/null "\b$(id -un)\b"; then
+	echo "User $(id -un) is in the group docker."
+    else
+        echo "Docker is not managed as a non-root user."
+	echo "Please refer to the following URL to manage Docker as a non-root user."
+        echo "https://docs.docker.com/install/linux/linux-postinstall/"
+	exit
+    fi
+else
+    echo "Docker is not installed or the execute permission is not granted."
+    echo "Please refer to the following URL to install Docker."
+    echo "http://redmine.corpnet.asus/projects/configuration-management-service/wiki/Docker"
     exit
 fi
 
-PATH_TO_SOURCE=$1
-if [ ! -d $PATH_TO_SOURCE ]; then
-  echo "The source directory [$PATH_TO_SOURCE] is not found."
-  exit
-fi
-
-DOCKER_IMAGE=${2:-}
-if [[ $DOCKER_IMAGE == "ubuntu16.04" ]]; then
-	DOCKER_IMAGE=_$DOCKER_IMAGE
-	if [[ "$(docker images -q asus/builder$DOCKER_IMAGE 2> /dev/null)" == "" ]]; then
-  		echo "Please run 'make ubuntu16' to make asus/builder$DOCKER_IMAGE docker image"
-		exit
-	else
-		echo "Use asus/builder$DOCKER_IMAGE image to docker run command"
-	fi
+if dpkg-query -s qemu-user-static 1>/dev/null 2>&1; then
+    echo "The package qemu-user-static is installed."
 else
-	DOCKER_IMAGE=""
-	echo "Use default docker image asus/builder"
+    echo "The package qemu-user-static is not installed yet and it will be installed now."
+    sudo apt-get install -y qemu-user-static
 fi
 
-OPTION="--privileged"
-OPTION+=" --rm -it"
+if dpkg-query -s binfmt-support 1>/dev/null 2>&1; then
+    echo "The package binfmt-support is installed."
+else
+    echo "The package binfmt-support is not installed yet and it will be installed now."
+    sudo apt-get install -y binfmt-support
+fi
 
-# Add option to use the current user ID and group ID on the host
-USER_ID=$(id -u)
-GROUP_ID=$(id -g)
-OPTION+=" --user $USER_ID:$GROUP_ID"
-#OPTION+=" --volume /home/leslie_yu/ASUS/source/gerrrit/mediatek/MTK8516_YOCTO_WW05_ASUS_R1:/source"
-#OPTION+=" --volume /home/leslie_yu/ASUS/source/gerrrit/intel/m-mr1-r2_cht_hr-dev:/source"
-#OPTION+=" --volume /mnt/storage3/ASUS/source/gerrit/rockchip/rk3399pro_oreo_sdk_v1.2.0:/source"
-OPTION+=" --volume $PATH_TO_SOURCE:/source"
+DIRECTORY_PATH_TO_DOCKER_BUILDER="$(dirname $(readlink -f $0))"
+echo "DIRECTORY_PATH_TO_DOCKER_BUILDER: $DIRECTORY_PATH_TO_DOCKER_BUILDER"
 
-CMD="/bin/bash"
-#CMD="source build/envsetup.sh && source ./javaenv.sh && lunch rk3399pro-userdebug && make -j12"
-#CMD="source build/envsetup.sh && export JAVA_HOME=/source/prebuilts/jdk/jdk8/linux-x86 && export PATH=$JAVA_HOME/bin:$PATH && export CLASSPATH=.:$JAVA_HOME/lib:$JAVA_HOME/lib/tools.jar && lunch rk3399pro-userdebug && make -j12"
-#CMD="source ./build/envsetup.sh && lunch BD_Nicola-userdebug && make -j48"
-#CMD="cd u-boot && make rk3399pro_defconfig && ./make.sh rk3399pro && cd .. && cd kernel && make ARCH=arm64 rockchip_defconfig -j8 && make ARCH=arm64 rk3399pro-evb-v11.img -j12 && cd .. && source build/envsetup.sh && export JAVA_HOME=/source/prebuilts/jdk/jdk8/linux-x86 && export PATH=$JAVA_HOME/bin:$PATH && export CLASSPATH=.:$JAVA_HOME/lib:$JAVA_HOME/lib/tools.jar && lunch rk3399pro-userdebug && make -j12 && ./mkimage.sh"
-#CMD="source ./build/envsetup.sh && lunch BD_Nicola-userdebug && make -j48"
-#CMD="rm -rf ./build && rm -rf ./sstate-cache && DATETIME=\`date '+%Y%m%d%H%M%S'\` && echo Builder_\$DATETIME > meta/poky/meta-firmware_version/recipes-bsp/bbversion/files/ver && export TEMPLATECONF=\${PWD}/meta/base/conf/mt8516/aud8516-emmc && source meta/poky/oe-init-build-env && echo PARALLEL_MAKE=\\\"-j 16\\\">>conf/local.conf && echo SECURE_BOOT_ENABLE = \\\"yes\\\" >> conf/local.conf && bitbake mtk-image-aud-8516 2>&1 | tee build.log"
+DIRECTORY_PATH_TO_SOURCE="$(dirname $DIRECTORY_PATH_TO_DOCKER_BUILDER)"
 
-#CMD="DATETIME=\`date '+%Y%m%d%H%M%S'\` && echo Builder_\$DATETIME > meta/poky/meta-firmware_version/recipes-bsp/bbversion/files/ver && export TEMPLATECONF=\${PWD}/meta/base/conf/mt8516/aud8516-emmc && source meta/poky/oe-init-build-env && echo PARALLEL_MAKE=\\\"-j 16\\\">>conf/local.conf && echo SECURE_BOOT_ENABLE = \\\"yes\\\" >> conf/local.conf && bitbake mtk-image-aud-8516 2>&1 | tee build.log"
+if [ $# -eq 0 ]; then
+    echo "There is no directory path to the source provided."
+    echo "Use the default directory path to the source [$DIRECTORY_PATH_TO_SOURCE]."
+else
+    DIRECTORY_PATH_TO_SOURCE=$1
+    if [ ! -d $DIRECTORY_PATH_TO_SOURCE ]; then
+        echo "The source directory [$DIRECTORY_PATH_TO_SOURCE] is not found."
+        exit
+    fi
+fi
 
-echo "Option to run docker: $OPTION"
-#echo "Shell command to be exectued in the container: $CMD"
+DOCKER_IMAGE="asus/builder:latest"
+#cp ~/.gitconfig gitconfig
+#cp -rp $DIRECTORY_PATH_TO_SOURCE/rk-rootfs-build-new/ubuntu-build-service/packages $DIRECTORY_PATH_TO_DOCKER_BUILDER/.
+docker build --build-arg userid=$(id -u) --build-arg groupid=$(id -g) --build-arg username=$(id -un) -t $DOCKER_IMAGE \
+    --file $DIRECTORY_PATH_TO_DOCKER_BUILDER/Dockerfile $DIRECTORY_PATH_TO_DOCKER_BUILDER
+#rm -rf $DIRECTORY_PATH_TO_DOCKER_BUILDER/packages
 
-docker run $OPTION asus/builder$DOCKER_IMAGE:latest /bin/sh -c "$CMD"
-#docker run $OPTION asus/builder:latest
+OPTIONS="--interactive --privileged --rm --tty"
+OPTIONS+=" --volume $DIRECTORY_PATH_TO_SOURCE:/source"
+echo "Options to run docker: $OPTIONS"
+
+docker run $OPTIONS $DOCKER_IMAGE
