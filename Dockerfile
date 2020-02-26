@@ -20,27 +20,57 @@ ARG username
 
 #COPY packages /packages
 
-# Install required packages for building Debian
-# Rockchip_RK3288 Linux_SDK_V2.1_发布说明_20180926.pdf
+# Install required packages for building Tinker Board (S) Debian
+# kmod: depmod is required by "make modules_install"
 RUN apt-get update && \
-    apt-get install -y apt-utils git gcc-arm-linux-gnueabihf u-boot-tools \
-    device-tree-compiler mtools parted libudev-dev libusb-1.0-0-dev \
-    python-linaro-image-tools linaro-image-tools libssl-dev autotools-dev \
-    libsigsegv2 m4 libdrm-dev curl sed make binutils build-essential gcc g++ \
-    bash patch gzip bzip2 perl tar cpio python unzip rsync file bc wget \
-    libncurses5 libglib2.0-dev openssh-client
+    apt-get install -y make gcc gcc-arm-linux-gnueabi device-tree-compiler bc \
+    python libssl-dev sudo udev psmisc kmod qemu-user-static parted dosfstools
+#repo git u-boot-tools mtools \
+#    parted libudev-dev libusb-1.0-0-dev \
+#    python-linaro-image-tools linaro-image-tools gcc-arm-linux-gnueabihf \
+#    gcc-aarch64-linux-gnu autoconf autotools-dev libsigsegv2 \
+#    m4 intltool libdrm-dev curl sed  binutils build-essential g++ bash \
+#    patch gzip bzip2 perl tar cpio unzip rsync file wget libncurses5 \
+#    libqt4-dev libglib2.0-dev libgtk2.0-dev libglade2-dev cvs mercurial rsync \
+#    openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib \
+#     pv e2fsprogs fakeroot devscripts libi2c-dev libncurses5-dev \
+#    texinfo liblz4-tool genext2fs
+#RUN apt-get update && \
+#    apt-get install -y apt-utils git gcc-arm-linux-gnueabihf u-boot-tools \
+#    device-tree-compiler mtools parted libudev-dev libusb-1.0-0-dev \
+#    python-linaro-image-tools linaro-image-tools libssl-dev autotools-dev \
+ #   libsigsegv2 m4 libdrm-dev curl sed make binutils build-essential gcc g++ \
+  #  bash patch gzip bzip2 perl tar cpio python unzip rsync file bc wget \
+   # libncurses5 libglib2.0-dev openssh-client
+
+# Install required packages for building Tinker Edge R Debian
+# RK3399PRO_LINUX_SDK_BETA_V0.01_20190217发布说明
+# The package libc6:386 is skipped.
+#RUN apt-get update && \
+ #   apt-get install -y repo git-core gitk git-gui gcc-arm-linux-gnueabihf \
+  #  u-boot-tools device-tree-compiler gcc-aarch64-linux-gnu mtools parted \
+   # libudev-dev libusb-1.0-0-dev python-linaro-image-tools linaro-image-tools \
+  #  gcc-4.8-multilib-arm-linux-gnueabihf gcc-arm-linux-gnueabihf libssl-dev \
+  #  gcc-aarch64-linux-gnu g+conf autotools-dev libsigsegv2 m4 intltool \
+  #  libdrm-dev curl sed make binutils build-essential gcc g++ bash patch gzip \
+  #  bzip2 perl tar cpio python unzip rsync file bc wget libncurses5 libqt4-dev \
+  #  libglib2.0-dev libgtk2.0-dev libglade2-dev cvs git mercurial rsync \
+  #  openssh-client subversion asciidoc w3m dblatex graphviz python-matplotlib \
+  #  libssl-dev texinfo liblz4-tool genext2fs
 
 # Install additional packages for building base debian system by ubuntu-build-service from linaro
 # Rockchip_RK3288 Linux_SDK_V2.1_发布说明_20180926.pdf
-RUN apt-get update && \
-    apt-get install -y binfmt-support qemu-user-static live-build debootstrap
+#RUN apt-get update && \
+#    apt-get install -y binfmt-support qemu-user-static live-build debootstrap
 # The following packages are intalled already as above.
 #RUN dpkg -i /packages/* || apt-get install -f -y
 
 # Install additional packages
-# kmod: depmod is required by "make modules_install"
-RUN apt-get update && \
-    apt-get install -y gcc-arm-linux-gnueabi udev psmisc kmod
+#time gcc-multilib
+
+# Install additional packages for building base debian system by ubuntu-build-service from linaro
+#binfmt-support live-build
+#RUN dpkg -i /packages/* || apt-get install -f -y
 
 RUN groupadd -g $groupid $username && \
     useradd -m -u $userid -g $groupid $username && \
