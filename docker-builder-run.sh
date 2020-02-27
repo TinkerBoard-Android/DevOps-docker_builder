@@ -51,10 +51,8 @@ fi
 
 DOCKER_IMAGE="asus/builder:latest"
 #cp ~/.gitconfig gitconfig
-#cp -rp $DIRECTORY_PATH_TO_SOURCE/rk-rootfs-build-new/ubuntu-build-service/packages $DIRECTORY_PATH_TO_DOCKER_BUILDER/.
 docker build --build-arg userid=$(id -u) --build-arg groupid=$(id -g) --build-arg username=$(id -un) -t $DOCKER_IMAGE \
     --file $DIRECTORY_PATH_TO_DOCKER_BUILDER/Dockerfile $DIRECTORY_PATH_TO_DOCKER_BUILDER
-#rm -rf $DIRECTORY_PATH_TO_DOCKER_BUILDER/packages
 
 OPTIONS="--interactive --privileged --rm --tty"
 OPTIONS+=" --volume $DIRECTORY_PATH_TO_SOURCE:/source"
