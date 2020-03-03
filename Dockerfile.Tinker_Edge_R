@@ -11,6 +11,8 @@
 #COPY gitconfig /home/$username/.gitconfig
 #RUN chown $userid:$groupid /home/$username/.gitconfig
 
+# This is used to build images for Tinker Edge R.
+
 FROM ubuntu:16.04
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -18,17 +20,11 @@ ARG userid
 ARG groupid
 ARG username
 
-#COPY packages /packages
-
-# Install required packages for building Tinker Board (S) Debian
+# Install required packages for building Tinker Edge R Debian
 # kmod: depmod is required by "make modules_install"
 RUN apt-get update && \
-    apt-get install -y make gcc gcc-arm-linux-gnueabi device-tree-compiler bc \
-    python libssl-dev sudo udev psmisc kmod qemu-user-static parted dosfstools
-
-# Install required packages for building Tinker Edge R Debian
-RUN apt-get update && \
-    apt-get install -y liblz4-tool time g++ patch wget cpio unzip rsync bzip2 \
+    apt-get install -y make gcc bc python libssl-dev sudo kmod \
+    qemu-user-static time liblz4-tool g++ patch wget cpio unzip rsync bzip2 \
     perl gcc-multilib git
 
 RUN groupadd -g $groupid $username && \
