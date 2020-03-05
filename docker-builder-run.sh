@@ -19,20 +19,6 @@ else
     exit
 fi
 
-if dpkg-query -s qemu-user-static 1>/dev/null 2>&1; then
-    echo "The package qemu-user-static is installed."
-else
-    echo "The package qemu-user-static is not installed yet and it will be installed now."
-    sudo apt-get install -y qemu-user-static
-fi
-
-if dpkg-query -s binfmt-support 1>/dev/null 2>&1; then
-    echo "The package binfmt-support is installed."
-else
-    echo "The package binfmt-support is not installed yet and it will be installed now."
-    sudo apt-get install -y binfmt-support
-fi
-
 DIRECTORY_PATH_TO_DOCKER_BUILDER="$(dirname $(readlink -f $0))"
 echo "DIRECTORY_PATH_TO_DOCKER_BUILDER: $DIRECTORY_PATH_TO_DOCKER_BUILDER"
 
@@ -49,11 +35,11 @@ else
     fi
 fi
 
-DOCKER_IMAGE="asus/builder-tinker_board-debian:latest"
+DOCKER_IMAGE="asus/builder-tinker_board-android_m:latest"
 docker build --build-arg userid=$(id -u) --build-arg groupid=$(id -g) --build-arg username=$(id -un) -t $DOCKER_IMAGE \
     --file $DIRECTORY_PATH_TO_DOCKER_BUILDER/Dockerfile $DIRECTORY_PATH_TO_DOCKER_BUILDER
 
-OPTIONS="--interactive --privileged --rm --tty --hostname tinkerboard"
+OPTIONS="--interactive --privileged --rm --tty"
 OPTIONS+=" --volume $DIRECTORY_PATH_TO_SOURCE:/source"
 echo "Options to run docker: $OPTIONS"
 
