@@ -35,7 +35,7 @@ else
     fi
 fi
 
-DOCKER_IMAGE="asus/builder-tinker_board-android_m:latest"
+DOCKER_IMAGE="asus/builder-tinker_board-android_n:latest"
 docker build --build-arg userid=$(id -u) --build-arg groupid=$(id -g) --build-arg username=$(id -un) -t $DOCKER_IMAGE \
     --file $DIRECTORY_PATH_TO_DOCKER_BUILDER/Dockerfile $DIRECTORY_PATH_TO_DOCKER_BUILDER
 
