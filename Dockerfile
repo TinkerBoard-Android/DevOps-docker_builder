@@ -8,8 +8,8 @@ ARG username
 # Install required packages for building Tinker Edge R Android
 # kmod: depmod is required by "make modules_install"
 RUN apt-get update && \
-    apt-get install -y make gcc python bc liblz4-tool git unzip m4 curl \
-    libxml2-utils zip xz-utils kmod
+    apt-get install -y make gcc python bc liblz4-tool git m4 zip python-crypto \
+    xz-utils gcc-multilib g++-multilib kmod
 
 RUN groupadd -g $groupid $username && \
     useradd -m -u $userid -g $groupid $username && \
