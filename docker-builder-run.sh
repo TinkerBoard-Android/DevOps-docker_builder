@@ -46,7 +46,7 @@ OPTIONS+=" --volume $DIRECTORY_PATH_TO_SOURCE:/source"
 echo "Options to run docker: $OPTIONS"
 
 if [ $BUILD_NUMBER ]; then
-	docker run $OPTIONS $DOCKER_IMAGE chroot --userspec=$USER:$USER / /bin/bash -c "cd /source; ./build.sh -n $BUILD_NUMBER -r"
+	docker run $OPTIONS $DOCKER_IMAGE chroot --userspec=$USER:$USER / /bin/bash -c "cd /source; ./build.sh -n $BUILD_NUMBER -r -o"
 else
 	docker run $OPTIONS $DOCKER_IMAGE chroot --userspec=$USER:$USER / /bin/bash -c "cd /source; /bin/bash -i"
 fi
