@@ -16,6 +16,9 @@ RUN curl -o jdk8.tgz https://android.googlesource.com/platform/prebuilts/jdk/jdk
     && mv linux-x86 /usr/lib/jvm/java-8-openjdk-amd64 \
     && rm -rf jdk8.tgz
 
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash \
+    && apt-get install git-lfs
+
 RUN groupadd -g $groupid $username && \
     useradd -m -u $userid -g $groupid $username && \
     echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
