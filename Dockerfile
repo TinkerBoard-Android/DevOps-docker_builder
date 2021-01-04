@@ -20,7 +20,6 @@ RUN groupadd -g $groupid $username && \
     useradd -m -u $userid -g $groupid $username && \
     echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-ENV LC_ALL=C
 ENV HOME=/home/$username
 ENV USER=$username
 WORKDIR /source
