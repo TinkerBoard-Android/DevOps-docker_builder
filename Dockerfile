@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG userid
@@ -9,12 +9,8 @@ ARG username
 # kmod: depmod is required by "make modules_install"
 RUN apt-get update && \
     apt-get install -y make gcc python gcc-multilib bc lzop sudo m4 zip git \
-    curl openjdk-7-jdk libxml2-utils kmod g++-multilib
-
-RUN curl -o jdk8.tgz https://android.googlesource.com/platform/prebuilts/jdk/jdk8/+archive/master.tar.gz \
-    && tar -zxf jdk8.tgz linux-x86 \
-    && mv linux-x86 /usr/lib/jvm/java-8-openjdk-amd64 \
-    && rm -rf jdk8.tgz
+    curl openjdk-8-jdk libxml2-utils kmod g++-multilib python3 libncurses5 \
+    rsync
 
 RUN groupadd -g $groupid $username && \
     useradd -m -u $userid -g $groupid $username && \
