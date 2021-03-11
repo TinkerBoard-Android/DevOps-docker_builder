@@ -10,7 +10,7 @@ ARG username
 RUN apt-get update && \
     apt-get install -y make gcc python bc liblz4-tool git m4 zip python-crypto \
     xz-utils gcc-multilib g++-multilib kmod bison flex python3-dev fontconfig \
-    libssl-dev parted
+    libssl-dev parted gawk
 
 RUN groupadd -g $groupid $username && \
     useradd -m -u $userid -g $groupid $username && \
