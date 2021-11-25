@@ -26,6 +26,18 @@ RUN groupadd -g $groupid $username && \
     echo "$username ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     echo $username >/root/username
 
+RUN wget http://archive.ubuntu.com/ubuntu/pool/main/l/lz4/liblz4-1_1.9.2-2_amd64.deb
+RUN dpkg -i liblz4-1_1.9.2-2_amd64.deb
+RUN rm liblz4-1_1.9.2-2_amd64.deb
+
+RUN wget http://archive.ubuntu.com/ubuntu/pool/main/l/lz4/lz4_1.9.2-2_amd64.deb
+RUN dpkg -i lz4_1.9.2-2_amd64.deb
+RUN rm lz4_1.9.2-2_amd64.deb
+
+RUN wget http://archive.ubuntu.com/ubuntu/pool/universe/l/lz4/liblz4-tool_1.9.2-2_all.deb
+RUN dpkg -i liblz4-tool_1.9.2-2_all.deb
+RUN rm liblz4-tool_1.9.2-2_all.deb
+
 ENV HOME=/home/$username
 ENV USER=$username
 WORKDIR /source
