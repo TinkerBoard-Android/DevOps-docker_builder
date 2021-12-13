@@ -23,4 +23,6 @@ WORKDIR /source
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
 
+COPY java.security /etc/java-8-openjdk/security/java.security
+
 ENTRYPOINT ["/entrypoint.sh"]
