@@ -4,7 +4,7 @@
 
 declare -r ASUS_DOCKER_ENV_DEFAULT_WORKDIR="/source"
 
-export ASUS_DOCKER_ENV_BRANCH="android11-rockchip"
+export ASUS_DOCKER_ENV_BRANCH="android12-rockchip"
 export ASUS_DOCKER_ENV_SOURCE="$(dirname ${ASUS_DOCKER_ENV_DIR})"
 export ASUS_DOCKER_ENV_DOCKERFILE="${ASUS_DOCKER_ENV_DIR}/Dockerfile"
 export ASUS_DOCKER_ENV_IMAGE="asus-iot/asus-docker-env-${ASUS_DOCKER_ENV_BRANCH}:latest"
