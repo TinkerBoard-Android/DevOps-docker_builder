@@ -9,7 +9,11 @@ export ASUS_DOCKER_ENV_SOURCE="$(dirname ${ASUS_DOCKER_ENV_DIR})"
 export ASUS_DOCKER_ENV_DOCKERFILE="${ASUS_DOCKER_ENV_DIR}/Dockerfile"
 export ASUS_DOCKER_ENV_IMAGE="asus-iot/asus-docker-env-${ASUS_DOCKER_ENV_BRANCH}:latest"
 export ASUS_DOCKER_ENV_WORKDIR=${ASUS_DOCKER_ENV_DEFAULT_WORKDIR}
-export ASUS_DOCKER_EVN_OPTIONS="--interactive --privileged --rm --tty --hostname asus-docker-env --volume ${ASUS_DOCKER_ENV_SOURCE}:${ASUS_DOCKER_ENV_WORKDIR} --workdir ${ASUS_DOCKER_ENV_WORKDIR}"
+if [ $# -eq 0 ]; then
+	export ASUS_DOCKER_EVN_OPTIONS="--interactive --privileged --rm --tty --hostname asus-docker-env --volume ${ASUS_DOCKER_ENV_SOURCE}:${ASUS_DOCKER_ENV_WORKDIR} --workdir ${ASUS_DOCKER_ENV_WORKDIR}"
+else
+	export ASUS_DOCKER_EVN_OPTIONS="--privileged --rm --tty --hostname asus-docker-env --volume ${ASUS_DOCKER_ENV_SOURCE}:${ASUS_DOCKER_ENV_WORKDIR} --workdir ${ASUS_DOCKER_ENV_WORKDIR}"
+fi
 
 #if [ $# -eq 0 ]; then
 #    echo "There is no directory path to the source provided."
@@ -121,29 +125,21 @@ function asus_docker_env_run() {
 #  fi
   if asus_docker_env_check_prerequisites; then
     asus_docker_env_build_docker_image
-#    if [ $# -eq 0 ]; then
+    if [ $# -eq 0 ]; then
       docker run ${ASUS_DOCKER_EVN_OPTIONS} ${ASUS_DOCKER_ENV_IMAGE} /bin/bash -c \
         "groupadd --gid $(id -g) $(id -g -n); \
         useradd -m -e \"\" -s /bin/bash --gid $(id -g) --uid $(id -u) $(id -u -n); \
         passwd -d $(id -u -n); \
         echo \"$(id -u -n) ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers; \
         sudo -E -u $(id -u -n) --set-home /bin/bash -i"
-#    else
-#      docker run --interactive --privileged --rm --tty \
-#        --hostname asus-docker-env \
-#        --volume $ASUS_DOCKER_ENV_SOURCE:$ASUS_DOCKER_ENV_WORKDIR \
-#        --workdir $ASUS_DOCKER_ENV_WORKDIR \
-#        --volume /var/run/docker.sock:/var/run/docker.sock \
-#        --volume /var/lib/docker:/var/lib/docker \
-#        $ASUS_DOCKER_ENV_IMAGE /bin/bash -c \
-#        "groupadd --gid $(id -g) $(id -g -n); \
-#        useradd -m -e \"\" -s /bin/bash --gid $(id -g) --uid $(id -u) $(id -u -n); \
-#        passwd -d $(id -u -n); \
-#        echo \"$(id -u -n) ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers; \
-#        sudo groupmod -g $(awk -F\: '/docker/ {print $3}' /etc/group) docker; \
-#        sudo usermod -aG docker $(id -u -n); \
-#        sudo -E -u $(id -u -n) --set-home ${1}"
-#    fi
+    else
+      docker run ${ASUS_DOCKER_EVN_OPTIONS} ${ASUS_DOCKER_ENV_IMAGE} /bin/bash -c \
+        "groupadd --gid $(id -g) $(id -g -n); \
+        useradd -m -e \"\" -s /bin/bash --gid $(id -g) --uid $(id -u) $(id -u -n); \
+        passwd -d $(id -u -n); \
+        echo \"$(id -u -n) ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers; \
+        sudo -E -u $(id -u -n) --set-home /bin/bash -c \"$*\""
+    fi
   fi
 #  if [[ "$ASUS_DOCKER_ENV_WORKDIR" != "$ASUS_DOCKER_ENV_DEFAULT_WORKDIR" ]]; then
 #    echo "Remove the symbolic link $ASUS_DOCKER_ENV_WORKDIR......."
@@ -169,5 +165,5 @@ function asus_docker_env_run() {
 #fi
 
 function asus_docker_env_main() {
-  asus_docker_env_run
+  asus_docker_env_run $*
 }
