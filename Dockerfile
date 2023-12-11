@@ -34,4 +34,5 @@ RUN wget http://archive.ubuntu.com/ubuntu/pool/universe/l/lz4/liblz4-tool_1.9.2-
 RUN dpkg -i liblz4-tool_1.9.2-2_all.deb
 RUN rm liblz4-tool_1.9.2-2_all.deb
 
-RUN apt-get install -y xxd cgpt
+RUN apt-get update && \
+    apt-get install -y xxd cgpt
